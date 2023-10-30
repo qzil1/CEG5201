@@ -2,10 +2,10 @@ import pickle
 import numpy as np
 
 if __name__ == '__main__':
-    with open('mult_result.pkl', 'rb') as file:
+    with open('mult_result.pkl.backup', 'rb') as file:
         mult_result = pickle.load(file)
 
-    with open('seq_result.pkl.pkl', 'rb') as file:
+    with open('seq_result.pkl.backup', 'rb') as file:
         seq_result = pickle.load(file)
 
     for i in range(10):

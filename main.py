@@ -5,18 +5,21 @@ import time
 from tqdm import tqdm
 from multiprocessing import Pool
 
-def generate_random():
+def generate_random(num = 10):
     size = [16, 32, 64, 128, 256, 512, 1024, 2048]
-    data_set = []
-    for i in size:
-        A = np.random.randint(0, 256, (i, i))
-        B = np.random.randint(0, 256, (i, i))
-        data_set.append((A, B))
+    result = []
+    for j in range(num):
+        data_set = []
+        for i in size:
+            A = np.random.randint(0, 256, (i, i))
+            B = np.random.randint(0, 256, (i, i))
+            data_set.append((A, B))
+        result.append(data_set)
     with open('dataset.pkl', 'wb') as file:
-        pickle.dump(data_set, file)
+        pickle.dump(result, file)
 
 def multiprocess_strassen(X, Y, pool_size):
-    if len(X) <= 2:
+    if len(X) <= 4:
         return X @ Y
 
     half_size = len(X) // 2
@@ -43,7 +46,7 @@ def multiprocess_strassen(X, Y, pool_size):
 
 
 def strassen(X, Y):
-    if len(X) <= 2:
+    if len(X) <= 4:
         return X @ Y
 
     half_size = len(X) // 2
@@ -71,13 +74,12 @@ def sequential_processing(data):
     result = []
     for i in tqdm(range(10)):
         t_array = []
-        for matrixs in tqdm(data):
+        for matrixs in tqdm(data[i]):
             A, B = matrixs
             start_time = time.perf_counter()
             _ = strassen(A, B)
             end_time = time.perf_counter()
             t = end_time - start_time
-            print(f"{len(t_array):^12}|{t:^30}|{sum(t_array):^40}")
             t_array.append(t)
         result.append(t_array)
     return result
@@ -87,7 +89,7 @@ def multi_processing(data, max_pool_size):
     result = []
     for i in tqdm(range(10)):
         group_time_array = []
-        for matrixs in tqdm(data):
+        for matrixs in tqdm(data[i]):
             A, B = matrixs
             single_time_array = []
             for k in range(2, max_pool_size + 1):
@@ -106,7 +108,7 @@ if __name__ == "__main__":
         data = pickle.load(file)
 
     sequential_result = sequential_processing(data)
-    with open('seq_result.pkl.pkl', 'wb') as file:
+    with open('seq_result.pkl', 'wb') as file:
         pickle.dump(sequential_result, file)
 
     multi_result = multi_processing(data, 4)
