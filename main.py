@@ -5,10 +5,10 @@ import time
 from tqdm import tqdm
 from multiprocessing import Pool
 
-def generate_random(num = 10):
+def generate_random(group_size = 10):
     size = [16, 32, 64, 128, 256, 512, 1024, 2048]
     result = []
-    for j in range(num):
+    for j in range(group_size):
         data_set = []
         for i in size:
             A = np.random.randint(0, 256, (i, i))
@@ -43,7 +43,7 @@ def multiprocess_strassen(X, Y, pool_size):
     Z22 = M1 - M3 - M4 - M5
 
     Z = np.vstack((np.hstack((Z11, Z12)), np.hstack((Z21, Z22))))
-
+    return Z
 
 def strassen(X, Y):
     if len(X) <= 4:
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     with open('seq_result.pkl', 'wb') as file:
         pickle.dump(sequential_result, file)
 
-    multi_result = multi_processing(data, 4)
+    multi_result = multi_processing(data, 8)
     with open('mult_result.pkl', 'wb') as file:
         pickle.dump(multi_result, file)

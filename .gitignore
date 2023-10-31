@@ -1,3 +1,5 @@
 dataset.pkl
 mult_result.pkl.backup
 seq_result.pkl.backup
+mult_result.*
+seq_result.*
