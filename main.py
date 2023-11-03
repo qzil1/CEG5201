@@ -6,6 +6,11 @@ from tqdm import tqdm
 from multiprocessing import Pool
 
 def generate_random(group_size = 10):
+    """
+    Generate the input matrix set
+    :param group_size: the number of groups
+    :return: [[(A,B) for different size] for different group]
+    """
     size = [16, 32, 64, 128, 256, 512, 1024, 2048]
     result = []
     for j in range(group_size):
@@ -18,9 +23,33 @@ def generate_random(group_size = 10):
     with open('dataset.pkl', 'wb') as file:
         pickle.dump(result, file)
 
+def matrix_multiply(X, Y):
+    """
+    Directly multiple two matrices
+    :param X: Matrix X in NumPy array type
+    :param Y: Matrix Y in NumPy array type
+    :return: the multiple of two matrices
+    """
+    rows_X, cols_X = X.shape
+    rows_Y, cols_Y = Y.shape
+    if cols_X != rows_Y:
+        raise ValueError('The column number of X must be equal to that of Y')
+    result = np.zeros((rows_X, cols_Y))
+    for i in range(rows_X):
+        for j in range(cols_Y):
+            for k in range(cols_X):
+                result[i, j] += X[i, k] * Y[k, j]
+    return result
 def multiprocess_strassen(X, Y, pool_size):
-    if len(X) <= 4:
-        return X @ Y
+    """
+    Multiprocessing version for strassen algorithm
+    :param X: Matrix X in NumPy array type
+    :param Y: Matrix Y in NumPy array type
+    :param pool_size: the number of available processes in the pool
+    :return: the multiply result of X and Y
+    """
+    if len(X) <= 2:
+        return matrix_multiply(X, Y)
 
     half_size = len(X) // 2
     X11, X12, X21, X22 = X[:half_size, :half_size], X[:half_size, half_size:], X[half_size:, :half_size], X[half_size:, half_size:]
@@ -46,8 +75,14 @@ def multiprocess_strassen(X, Y, pool_size):
     return Z
 
 def strassen(X, Y):
-    if len(X) <= 4:
-        return X @ Y
+    """
+    Single-processing version for strassen algorithm
+    :param X: Matrix X in NumPy array type
+    :param Y: Matrix Y in NumPy array type
+    :return: the multiply result of X and Y
+    """
+    if len(X) <= 2:
+        return matrix_multiply(X, Y)
 
     half_size = len(X) // 2
     X11, X12, X21, X22 = X[:half_size, :half_size], X[:half_size, half_size:], X[half_size:, :half_size], X[half_size:, half_size:]
@@ -71,6 +106,11 @@ def strassen(X, Y):
 
 
 def sequential_processing(data):
+    """
+    Experiment the sequential matrix multiply
+    :param data: the input matrix set
+    :return: [[time_consumed for different_size] for different_group]
+    """
     result = []
     for i in tqdm(range(10)):
         t_array = []
@@ -86,6 +126,12 @@ def sequential_processing(data):
 
 
 def multi_processing(data, max_pool_size):
+    """
+    Experiment the multiprocessing matrix multiply
+    :param data: the input matrix set
+    :param max_pool_size: the maximum size for the process pool
+    :return: [[[time_consumed for different_process_number] for different_size] for different_group]
+    """
     result = []
     for i in tqdm(range(10)):
         group_time_array = []
