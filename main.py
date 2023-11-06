@@ -40,6 +40,8 @@ def matrix_multiply(X, Y):
             for k in range(cols_X):
                 result[i, j] += X[i, k] * Y[k, j]
     return result
+
+
 def multiprocess_strassen(X, Y, pool_size):
     """
     Multiprocessing version for strassen algorithm
@@ -48,9 +50,6 @@ def multiprocess_strassen(X, Y, pool_size):
     :param pool_size: the number of available processes in the pool
     :return: the multiply result of X and Y
     """
-    if len(X) <= 2:
-        return matrix_multiply(X, Y)
-
     half_size = len(X) // 2
     X11, X12, X21, X22 = X[:half_size, :half_size], X[:half_size, half_size:], X[half_size:, :half_size], X[half_size:, half_size:]
     Y11, Y12, Y21, Y22 = Y[:half_size, :half_size], Y[:half_size, half_size:], Y[half_size:, :half_size], Y[half_size:, half_size:]
@@ -74,6 +73,7 @@ def multiprocess_strassen(X, Y, pool_size):
     Z = np.vstack((np.hstack((Z11, Z12)), np.hstack((Z21, Z22))))
     return Z
 
+
 def strassen(X, Y):
     """
     Single-processing version for strassen algorithm
@@ -81,7 +81,7 @@ def strassen(X, Y):
     :param Y: Matrix Y in NumPy array type
     :return: the multiply result of X and Y
     """
-    if len(X) <= 2:
+    if len(X) <= 8:
         return matrix_multiply(X, Y)
 
     half_size = len(X) // 2

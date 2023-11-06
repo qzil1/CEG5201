@@ -11,8 +11,7 @@ if __name__ == '__main__':
     process_num = 8
 
     for i in range(10):
-        for j in range(8):
-            mult_result[i][j] = [seq_result[i][j]] + mult_result[i][j]
+        mult_result[i] = [[seq_result[i][j]] + mult_list for j, mult_list in enumerate(mult_result[i])]
 
     print(f'Processing time of G0 under sequential implementation')
     print(f"|{'Pair index':^12}|{'Measured Sequential Time':^30}|{'Measured Cumulative Sequential time':^40}|")
